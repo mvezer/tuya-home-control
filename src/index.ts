@@ -1,7 +1,10 @@
-import {app} from './app'
-import {AddressInfo} from 'net'
+import App from './App';
+import routes from './routes';
 
-const server = app.listen(5000, '0.0.0.0', () => {
-    const {port, address} = server.address() as AddressInfo;
-    console.log('Server listening on:','http://' + address + ':'+port);
+const app:App = new App({
+    port: parseInt(process.env.SERVER_PORT, 10)
 });
+
+app.setupRoutes(routes);
+
+app.start();
