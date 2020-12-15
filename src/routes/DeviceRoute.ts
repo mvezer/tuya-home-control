@@ -19,6 +19,14 @@ export default class DevicesRoute implements IRoute {
         app.put('/api/devices/:deviceId', (req: Request, res: Response) => {
             this.devicesController.update(req, res);
         });
+
+        app.get('/api/devices/:deviceId/status', (req: Request, res: Response) => {
+            this.devicesController.getDeviceStatus(req, res);
+        });
+
+        app.put('/api/devices/:deviceId/status', (req: Request, res: Response) => {
+            this.devicesController.updatetDeviceStatus(req, res);
+        });
     }
 }
 

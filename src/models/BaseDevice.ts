@@ -1,4 +1,4 @@
-import { model, Schema, Model, Document } from 'mongoose';
+import { Schema } from 'mongoose';
 const TuyaDevice = require('tuyapi');
 
 export const DEVICE_TYPES = ['rgb_bulb', 'plug'];
@@ -141,7 +141,7 @@ export default abstract class BaseDevice {
     }
 
     async setStatus(newStatus: { [index:string]:string }) {
-        this._status = newStatus;
+        // this._status = newStatus;
         let dpsDto:{ [index:string]:string } = {}
         for (let [statusKey, statusValue] of Object.entries(newStatus)) {
             const dpsKey = this.getDPSkey(statusKey);
@@ -201,6 +201,8 @@ export default abstract class BaseDevice {
     }
 
     abstract get dpsMap():Map<string, string>;
+
+    abstract get statusSchema():any;
 
     toString(fullData: boolean = false):string {
         if (!fullData) {
