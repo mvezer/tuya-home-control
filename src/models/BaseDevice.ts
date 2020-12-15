@@ -2,6 +2,8 @@ import { model, Schema, Model, Document } from 'mongoose';
 const TuyaDevice = require('tuyapi');
 
 export const DEVICE_TYPES = ['rgb_bulb', 'plug'];
+export const TICK_TIMEOUT = 10;
+export const HEARTBEAT_TIMEOUT = 15;
 
 export type TDeviceData = {
     deviceId: string,
@@ -19,9 +21,10 @@ export default abstract class BaseDevice {
     private _key: string;
     private _type: string;
     private _status:{ [index:string] : string };
-    private _isConnected: boolean;
     private _groupId: string;
     private _tuyaDevice:any;
+    private _lastHeartbeat:number;
+    private _firstConnectAttempt:boolean;
 
     private _onData:(handlerData:TDeviceData, error: any) => void;
     private _onError:(handlerData:TDeviceData, error: any) => void;
@@ -37,27 +40,34 @@ export default abstract class BaseDevice {
         this._type = deviceData.type;
         this._status = {};
         this._groupId = deviceData.groupId;
-        this._isConnected = false;
+        this._firstConnectAttempt = true;
     }
 
     public async connect(): Promise<void> {
-        console.log('Connecting device...');
         this._tuyaDevice = new TuyaDevice({ id: this._deviceId, key: this._key });
+        console.debug(`[device] ${this.toString()} connecting...`);
 
         this._tuyaDevice.on('connected', this.handleConnected.bind(this));
         this._tuyaDevice.on('disconnected', this.handleDisconnected.bind(this));
         this._tuyaDevice.on('data', this.handleData.bind(this));
         this._tuyaDevice.on('error', this.handleError.bind(this));
-        
-        await this._tuyaDevice.find();
-        await this._tuyaDevice.connect();
-    }
+        this._tuyaDevice.on('heartbeat', this.handleHeartbeat.bind(this));
 
-    // handlers  
+        try {
+            await this._tuyaDevice.find();
+            await this._tuyaDevice.connect();
+        } catch (error:any) {
+            console.error(`[device] ${this.toString()}, ERROR when connecting: ${error}`);
+        } finally {
+            if (this._firstConnectAttempt) {
+                this._firstConnectAttempt = false;
+                setTimeout(this.tick.bind(this), TICK_TIMEOUT * 1000);
+            }
+        }
+    }
 
     private handleConnected() {
         console.debug(`[device] ${this.toString()} connected`);
-        this._isConnected = true;
         if (this._onConnected) {
             this._onConnected(this.toObject(), null);
         }
@@ -65,7 +75,6 @@ export default abstract class BaseDevice {
 
     private handleDisconnected() {
         console.debug(`[device] ${this.toString()} disconnected`);
-        this._isConnected = false;
         if (this._onDisconnected) {
             this._onDisconnected(this.toObject(), null);
         }
@@ -80,7 +89,7 @@ export default abstract class BaseDevice {
 
     private async handleData(data:any) {
         console.debug(`[device] ${this.toString()} data received`);
-        console.debug(data);
+        
         let dps:object = {};
 
         try {
@@ -93,8 +102,23 @@ export default abstract class BaseDevice {
             }
 
         } catch (error: any) {
-            console.error(`[device] ${this.toString()}, ERROR when parsing data: ${error}`)
+            console.error(`[device] ${this.toString()}, ERROR when parsing data: ${error}`);
+            console.debug('     ', data);
         }
+    }
+
+    private handleHeartbeat():void {
+        this._lastHeartbeat = Math.floor(Date.now()/1000);
+    }
+
+    private tick():void {
+        const currentTimestamp = Math.floor(Date.now()/1000);
+
+        if (!this.isConnected || (currentTimestamp - this._lastHeartbeat) > HEARTBEAT_TIMEOUT) {
+            this.connect();
+        }
+
+        setTimeout(this.tick.bind(this), TICK_TIMEOUT * 1000);
     }
 
     private updateStatusFromDPS(dps:object): void {
@@ -127,7 +151,7 @@ export default abstract class BaseDevice {
             }
         }
 
-        if (this._tuyaDevice && this._isConnected && {} !== dpsDto) {
+        if (this.isConnected && {} !== dpsDto) {
             try {
                 await this._tuyaDevice.set({ multiple: true, data: dpsDto });
             } catch (error: any) {
@@ -138,6 +162,10 @@ export default abstract class BaseDevice {
 
     get name(): string {
         return this._name;
+    }
+
+    set name(newName: string) {
+        this._name;
     }
 
     get type(): string {
@@ -153,7 +181,7 @@ export default abstract class BaseDevice {
     }
 
     get isConnected(): boolean {
-        return this._isConnected;
+        return this._tuyaDevice && this._tuyaDevice.isConnected();
     }
 
     get onData():(handlerData:TDeviceData, error: any) => void {
@@ -184,13 +212,13 @@ export default abstract class BaseDevice {
 
     toObject():TDeviceData {
         return {
-            deviceId: this._deviceId,
-            name: this._name,
-            key: this._key,
-            type: this._type,
-            isConnected: this._isConnected,
-            status: this._status,
-            groupId: this._groupId,
+            deviceId: this.deviceId,
+            name: this.name,
+            key: this.key,
+            type: this.type,
+            isConnected: this.isConnected,
+            status: this.status,
+            groupId: this.groupId,
         };
     }
 

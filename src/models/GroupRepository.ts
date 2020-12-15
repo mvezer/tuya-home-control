@@ -1,4 +1,5 @@
 import * as mongoose from 'mongoose';
+import MongoDbHandler from '../handlers/MongoDbHandler';
 import BaseDevice, {TDeviceData} from './BaseDevice';
 import DeviceFactory from './DeviceFactory';
 const DEVICE_TYPES = ['rgb_bulb', 'plug'];
@@ -13,14 +14,20 @@ const DeviceModel = mongoose.model('Device', new mongoose.Schema({
 
 export default class DeviceRepository {
     private devices:Array<BaseDevice> = [];
+    private _db:MongoDbHandler
     private _isInitialized:boolean = false;
 
     constructor() {
-        
+        this._db = new MongoDbHandler(
+            process.env['MONGODB_URL'],
+            parseInt(process.env['MONGODB_PORT'], 10),
+            process.env['MONGODB_NAME'],
+        );
     }
 
     async init():Promise<void> {
         try {
+            await this._db.connect();
             (await this.loadAllFromDb()).map(device => this.initDevice(device), this);
         } catch (error: any) {
             console.error(`[DeviceRepository] ERROR in init: ${error.message}`);
@@ -36,7 +43,7 @@ export default class DeviceRepository {
     }
 
     async onDeviceData(handlerData:TDeviceData, error: any): Promise<void> {
-        // console.log(JSON.stringify(handlerData, null, 4));
+        console.log(JSON.stringify(handlerData, null, 4));
     }
 
     async addDevice(newDeviceData:TDeviceData):Promise<void> {

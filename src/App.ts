@@ -1,5 +1,6 @@
 import express, { Application, Response } from 'express';
 import {AddressInfo} from 'net';
+
 import * as bodyParser from 'body-parser';
 import { IRoute } from './routes/IRoute';
 
@@ -11,8 +12,8 @@ export default class App {
     private _port:number;
     private _app:Application;
 
-    constructor(confidData:TAppConfig) {
-        this._port = confidData.port;
+    constructor(configdData:TAppConfig) {
+        this._port = configdData.port;
         this._app = express();
 
         this.configure();
@@ -31,10 +32,10 @@ export default class App {
         routes.forEach(route => route.route(this._app));
     }
 
-    start():void {
+    async start():Promise<void> {
         const server = this._app.listen(this._port, () => {
             const {port, address} = server.address() as AddressInfo;
-            console.info('Tuya Home Control is listening on:','http://' + address + ':'+port);
+            console.info('[server] started, listening on','http://' + address + ':'+port);
         });
     }
 }

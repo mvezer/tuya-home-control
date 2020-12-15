@@ -1,3 +1,5 @@
-import deviceRoute from "./DeviceRoute";
+import SingletonHandler from '../handlers/SingletonHandler';
 
-export default [ deviceRoute ];
+export default [
+    SingletonHandler.getInstance('DeviceRoute')
+];
