@@ -1,34 +1,18 @@
 import * as mongoose from 'mongoose';
-import MongoDbHandler from '../handlers/MongoDbHandler';
-import BaseDevice, {TDeviceData} from './BaseDevice';
-import DeviceFactory from './DeviceFactory';
-const DEVICE_TYPES = ['rgb_bulb', 'plug'];
+import Group, {TGroupData} from './Group';
 
-const DeviceModel = mongoose.model('Device', new mongoose.Schema({
-    deviceId: { type: String, required: true, unique: true },
-    key: { type: String, required: true },
-    type: { type: String, enum: DEVICE_TYPES, required: true },
-    name: { type: String, required: true },
-    groupId: { type: String, required: false }
+const GroupModel = mongoose.model('Group', new mongoose.Schema({
+    name: { type: String, required: true, unique: true },
+    groupId: { type: String, required: true, unique: true },
 }));
 
-export default class DeviceRepository {
-    private devices:Array<BaseDevice> = [];
-    private _db:MongoDbHandler
+export default class GroupRepository {
+    private groups:Array<Group> = [];
     private _isInitialized:boolean = false;
-
-    constructor() {
-        this._db = new MongoDbHandler(
-            process.env['MONGODB_URL'],
-            parseInt(process.env['MONGODB_PORT'], 10),
-            process.env['MONGODB_NAME'],
-        );
-    }
 
     async init():Promise<void> {
         try {
-            await this._db.connect();
-            (await this.loadAllFromDb()).map(device => this.initDevice(device), this);
+            this.groups = await this.loadAllFromDb();
         } catch (error: any) {
             console.error(`[DeviceRepository] ERROR in init: ${error.message}`);
         }
@@ -36,68 +20,52 @@ export default class DeviceRepository {
         this._isInitialized = true;
     }
 
-    async initDevice(device:BaseDevice): Promise<void> {
-        device.onData = this.onDeviceData.bind(this);
-        await device.connect();
-        this.devices.push(device);
+    async add(name:string):Promise<Group> {
+        const newGroup = new Group(name);
+        this.groups.push(newGroup);
+        await (new GroupModel(newGroup.toObject())).save();
+
+        return newGroup;
     }
 
-    async onDeviceData(handlerData:TDeviceData, error: any): Promise<void> {
-        console.log(JSON.stringify(handlerData, null, 4));
+    getGroupByName(name:string):Group {
+        return this.groups.find(group => group.name === name);
     }
 
-    async addDevice(newDeviceData:TDeviceData):Promise<void> {
-        if (this.getDeviceById(newDeviceData.deviceId)) {
-            throw new Error(`[DeviceRepository] ERROR: cannot add device, device (deviceId: $newDeviceData.deviceId}) already exists`);
-        } else {
-            const newDevice = DeviceFactory.fromObject(newDeviceData);
-            await this.initDevice(newDevice);
-            await (new DeviceModel(newDevice.toObject())).save();
-        }
+    getGroupById(groupId:string):Group {
+        return this.groups.find(group => group.groupId === groupId);
     }
 
-    async updateDevice(deviceId: string, updateDeviceData:object):Promise<void> {
-        const device:BaseDevice = this.getDeviceById(deviceId);
-        for (let [k, v] of Object.entries(updateDeviceData)) {
+    async update(groupId: string, updateGroupData:object):Promise<void> {
+        const group:Group = this.getGroupById(groupId);
+        for (let [k, v] of Object.entries(updateGroupData)) {
             switch (k) {
                 case 'name':
-                    device.name = v;
-                    break;
-                case 'groupId':
-                    device.groupId = v;
+                    group.name = v;
                     break;
             }
         }
-        await DeviceModel.updateOne({ deviceId}, updateDeviceData);
+        await GroupModel.updateOne({ groupId}, updateGroupData);
     }
 
-    getAllDevices():Array<BaseDevice> {
-        return this.devices;
+    getAllGroups():Array<Group> {
+        return this.groups;
     }
 
-    getDeviceById(deviceId:string):BaseDevice {
-        return this.devices.find(device => device.deviceId === deviceId);
-    }
-
-    async loadAllFromDb():Promise<BaseDevice[]> {
-        let devices:Array<BaseDevice> = [];
+    async loadAllFromDb():Promise<Group[]> {
+        let groups:Array<Group> = [];
         try {
-            devices = (await DeviceModel.find())
-                .map(deviceDocument => DeviceFactory.fromObject({
-                    deviceId: deviceDocument.get('deviceId'),
-                    name: deviceDocument.get('name'),
-                    key: deviceDocument.get('key'),
-                    type: deviceDocument.get('type'),
-                    status: {},
-                    groupId: deviceDocument.get('groupId'),
-                    isConnected: false
+            groups = (await GroupModel.find())
+                .map(groupDocument => Group.fromDbData({
+                    groupId: groupDocument.get('groupId'),
+                    name: groupDocument.get('name'),
                 })
             );
         } catch (error: any) {
-            console.error(`[DeviceRepository] ERROR in init: ${error.message}`);
+            console.error(`[GroupRepository] ERROR in init: ${error.message}`);
         }
 
-        return devices;
+        return groups;
     }
 
     get isInitialized():boolean {

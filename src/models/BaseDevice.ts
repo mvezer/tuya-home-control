@@ -1,4 +1,3 @@
-import { Schema } from 'mongoose';
 const TuyaDevice = require('tuyapi');
 
 export const DEVICE_TYPES = ['rgb_bulb', 'plug'];
@@ -30,8 +29,6 @@ export default abstract class BaseDevice {
     private _onError:(handlerData:TDeviceData, error: any) => void;
     private _onConnected:(handlerData:TDeviceData, error: any ) => void;
     private _onDisconnected:(handlerData:TDeviceData, error: any) => void;
-
-    protected deviceSchema:Schema;
 
     constructor(deviceData:TDeviceData) {
         this._deviceId = deviceData.deviceId;
@@ -141,7 +138,6 @@ export default abstract class BaseDevice {
     }
 
     async setStatus(newStatus: { [index:string]:string }) {
-        // this._status = newStatus;
         let dpsDto:{ [index:string]:string } = {}
         for (let [statusKey, statusValue] of Object.entries(newStatus)) {
             const dpsKey = this.getDPSkey(statusKey);

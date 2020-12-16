@@ -72,6 +72,10 @@ export default class DeviceRepository {
         return this.devices.find(device => device.deviceId === deviceId);
     }
 
+    getDevicesByGroupId(groupId:string):Array<BaseDevice> {
+        return this.devices.filter(device => device.groupId === groupId) || [];
+    }
+
     async loadAllFromDb():Promise<BaseDevice[]> {
         let devices:Array<BaseDevice> = [];
         try {

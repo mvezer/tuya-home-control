@@ -2,10 +2,13 @@ import App from './App';
 import routes from './routes';
 import SingletonHandler from './handlers/SingletonHandler';
 import MongoDbHandler from './handlers/MongoDbHandler';
-import DevicesRoute from './routes/DeviceRoute';
+import DevicesRoute from './routes/DevicesRoute';
+import GroupsRoute from './routes/GroupsRoute';
 import DeviceRepository from './models/DeviceRepository';
 import DevicesController from './controller/DevicesController';
 import figlet from 'figlet';
+import GroupRepository from './models/GroupRepository';
+import GroupsController from './controller/GroupsController';
 
 
 const init = async () => {
@@ -13,9 +16,15 @@ const init = async () => {
     console.info('---------= Tuya Home Control =----------');
     console.info('');
     await SingletonHandler.getInstance('MongoDbHandler').connect();
-    await SingletonHandler.getInstance('DeviceRepository').init();
+    await Promise.all([
+        SingletonHandler.getInstance('DeviceRepository').init(),
+        SingletonHandler.getInstance('GroupRepository').init()
+    ]);
 
-    app.setupRoutes([ SingletonHandler.getInstance('DevicesRoute') ]);
+    app.setupRoutes([
+        SingletonHandler.getInstance('DevicesRoute'),
+        SingletonHandler.getInstance('GroupsRoute')
+    ]);
 }
 
 const registerSingletons = () => {
@@ -29,6 +38,9 @@ const registerSingletons = () => {
     const devicesController = SingletonHandler.register('DevicesController', new DevicesController(deviceRepository));
     SingletonHandler.register('DevicesRoute', new DevicesRoute(devicesController));
 
+    const groupRepository:GroupRepository = SingletonHandler.register('GroupRepository', new GroupRepository());
+    const groupsController = SingletonHandler.register('GroupsController', new GroupsController(groupRepository, deviceRepository));
+    SingletonHandler.register('GroupsRoute', new GroupsRoute(groupsController));
 }
 
 registerSingletons();
