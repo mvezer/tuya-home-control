@@ -28,7 +28,7 @@ export default class DevicesController extends BaseController {
         try {
             await DEVICE_ADD_SCHEMA.validateAsync(req.body);
         } catch (error) {
-            res.status(400).json({ data: null, error: `Cannot add device: ${error.message}` });
+            this.respondError(res, `Cannot add device: ${error.message}`, 400);
             return;
         }
 
@@ -43,6 +43,8 @@ export default class DevicesController extends BaseController {
     }
 
     async update(req: Request, res: Response): Promise<void> {
+        const { deviceId } = req.params;
+
         try {
             await DEVICE_UPDATE_SCHEMA.validateAsync(req.body);
         } catch (error) {
@@ -50,13 +52,13 @@ export default class DevicesController extends BaseController {
             return;
         }
 
-        if (!this.deviceRepository.getDeviceById(req.params.deviceId)) {
+        if (!this.deviceRepository.getDeviceById(deviceId)) {
             this.respondError(res, `Cannot update device: device does not exist!`, 404);
             return;
         }
 
         try {
-            await this.deviceRepository.updateDevice(req.params.deviceId, req.body);
+            await this.deviceRepository.updateDevice(deviceId, req.body);
         } catch (error:any) {
             this.respondError(res, `Cannot update device: ${error.getMessage()}`);
             return;
@@ -66,15 +68,20 @@ export default class DevicesController extends BaseController {
     }
 
     async getDeviceStatus(req: Request, res: Response): Promise<void> {
-        if (!this.deviceRepository.getDeviceById(req.params.deviceId)) {
+        const { deviceId } = req.params;
+
+        if (!this.deviceRepository.getDeviceById(deviceId)) {
             this.respondError(res, `Cannot update device: device does not exist!`, 404);
             return;
         }
-        this.respondOk(res, this.deviceRepository.getDeviceById(req.params.deviceId).status);
+
+        this.respondOk(res, this.deviceRepository.getDeviceById(deviceId).status);
     }
 
     async updatetDeviceStatus(req: Request, res: Response): Promise<void> {
-        const device:BaseDevice = this.deviceRepository.getDeviceById(req.params.deviceId);
+        const { deviceId } = req.params;
+
+        const device:BaseDevice = this.deviceRepository.getDeviceById(deviceId);
         if (!device) {
             this.respondError(res, `Cannot update device: device does not exist!`, 404);
             return;
@@ -83,7 +90,7 @@ export default class DevicesController extends BaseController {
         try {
             await device.statusSchema.validateAsync(req.body);
         } catch (error) {
-            res.status(400).json({ data: null, error: `Cannot update device status device: ${error.message}` });
+            this.respondError(res, `Cannot update device status: ${error.message}`, 400);
             return;
         }
 
@@ -93,10 +100,12 @@ export default class DevicesController extends BaseController {
     }
 
     async delete(req: Request, res: Response):Promise<void> {
+        const { deviceId } = req.params;
+
         try {
-            await this.deviceRepository.deleteDevice(req.params.deviceId);
+            await this.deviceRepository.deleteDevice(deviceId);
         } catch (error:any) {
-            res.status(500).json({ data: null, error: `Cannot delete device! ${error.message}` });
+            this.respondError(res, `Cannot delete device! ${error.message}`);
             return;
         }
 

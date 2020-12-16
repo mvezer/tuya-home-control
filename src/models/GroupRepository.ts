@@ -48,6 +48,10 @@ export default class GroupRepository {
         await GroupModel.updateOne({ groupId}, updateGroupData);
     }
 
+    async delete(groupId: string):Promise<void> {
+        await GroupModel.deleteOne({ groupId });
+    }
+
     getAllGroups():Array<Group> {
         return this.groups;
     }

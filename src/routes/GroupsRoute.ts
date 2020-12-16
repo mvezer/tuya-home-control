@@ -5,41 +5,45 @@ import GroupsController from '../controller/GroupsController';
 const BASE_URL = '/api/groups';
 
 export default class GroupsRoute implements IRoute {
-    private groupController:GroupsController;
+    private groupsController:GroupsController;
 
-    constructor(groupController:GroupsController) {
-        this.groupController = groupController;
+    constructor(groupsController:GroupsController) {
+        this.groupsController = groupsController;
     }
     route(app:Application):void {
         app.get(BASE_URL, (req: Request, res: Response) => {
-            this.groupController.getAll(req, res);
+            this.groupsController.getAll(req, res);
         });
         app.post(BASE_URL, (req: Request, res: Response) => {
-            this.groupController.add(req, res);
+            this.groupsController.add(req, res);
         });
 
         app.get(`${BASE_URL}/:groupId`, (req: Request, res: Response) => {
-            this.groupController.getById(req, res);
+            this.groupsController.getById(req, res);
         });
 
         app.put(`${BASE_URL}/:groupId`, (req: Request, res: Response) => {
-            this.groupController.update(req, res);
+            this.groupsController.update(req, res);
+        });
+
+        app.delete(`${BASE_URL}/:groupId`, (req: Request, res: Response) => {
+            this.groupsController.delete(req, res);
         });
 
         app.get(`${BASE_URL}/:groupId/devices`, (req: Request, res: Response) => {
-            this.groupController.getDevicesByGroupId(req, res);
+            this.groupsController.getDevicesByGroupId(req, res);
         });
 
         app.post(`${BASE_URL}/:groupId/devices/:deviceId`, (req: Request, res: Response) => {
-            this.groupController.addDeviceToGroup(req, res);
+            this.groupsController.addDeviceToGroup(req, res);
         });
 
         app.delete(`${BASE_URL}/:groupId/devices/:deviceId`, (req: Request, res: Response) => {
-            this.groupController.removeDeviceFromGroup(req, res);
+            this.groupsController.removeDeviceFromGroup(req, res);
         });
 
         app.put(`${BASE_URL}/:groupId/status`, (req: Request, res: Response) => {
-            this.groupController.updateDeviceStatuses(req, res);
+            this.groupsController.updateDeviceStatuses(req, res);
         });
 
     }

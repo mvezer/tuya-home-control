@@ -1,4 +1,4 @@
-import { request, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import BaseController from "./BaseController";
 import Joi from 'joi';
 import GroupRepository from "../models/GroupRepository";
@@ -28,14 +28,14 @@ export default class GroupsController extends BaseController {
         try {
             await GROUP_ADD_SCHEMA.validateAsync(req.body);
         } catch (error) {
-            res.status(400).json({ data: null, error: `Cannot add group: ${error.message}` });
+            this.respondError(res, `Cannot add group: ${error.message}`, 400);
             return;
         }
 
         const { name } = req.body;
 
         if (this.groupRepository.getGroupByName(name)) {
-            res.status(400).json({ data: null, error: `Cannot add group, because the name "${name}" is already registered` });
+            this.respondError(res, `Cannot add group, because the name "${name}" is already registered`, 400);
             return;
         }
 
@@ -51,6 +51,8 @@ export default class GroupsController extends BaseController {
     }
 
     async update(req: Request, res: Response): Promise<void> {
+        const { groupId } = req.params;
+
         try {
             await GROUP_UPDATE_SCHEMA.validateAsync(req.body);
         } catch (error) {
@@ -58,15 +60,36 @@ export default class GroupsController extends BaseController {
             return;
         }
 
-        if (!this.groupRepository.getGroupById(req.params.groupId)) {
+        if (!this.groupRepository.getGroupById(groupId)) {
             this.respondError(res, `Cannot update group: group does not exist!`, 404);
             return;
         }
 
         try {
-            await this.groupRepository.update(req.params.groupId, req.body);
+            await this.groupRepository.update(groupId, req.body);
         } catch (error:any) {
-            this.respondError(res, `Cannot update group: ${error.getMessage()}`);
+            this.respondError(res, `Cannot update group: ${error.message}`);
+            return;
+        }
+
+        this.respondOk(res);
+    }
+
+    async delete(req: Request, res: Response): Promise<void> {
+        const { groupId } = req.params;
+        
+        if (!this.groupRepository.getGroupById(groupId)) {
+            this.respondError(res, `Cannot delete group: group does not exist!`, 404);
+            return;
+        }
+        const devicesInGroup:Array<BaseDevice> = this.deviceRepository.getDevicesByGroupId(groupId);
+        try {
+            await Promise.all(
+                devicesInGroup.map(device => this.deviceRepository.updateDevice(device.deviceId, { groupId: null }))
+            );
+            this.groupRepository.delete(groupId);
+        } catch (error:any) {
+            this.respondError(res, `Cannot delete group: ${error.message}`);
             return;
         }
 
@@ -91,68 +114,76 @@ export default class GroupsController extends BaseController {
     }
 
     getDevicesByGroupId(req: Request, res: Response): void {
-        if (!this.groupRepository.getGroupById(req.params.groupId)) {
+        const { groupId } = req.params;
+
+        if (!this.groupRepository.getGroupById(groupId)) {
             this.respondError(res, `Group does not exist!`, 404);
             return;
         }
 
-        this.respondOk(res, this.deviceRepository.getDevicesByGroupId(req.params.groupId));
+        this.respondOk(res, this.deviceRepository.getDevicesByGroupId(groupId));
     }
 
     async addDeviceToGroup(req: Request, res: Response): Promise<void> {
-        if (!this.groupRepository.getGroupById(req.params.groupId)) {
+        const { groupId, deviceId } = req.params;
+
+        if (!this.groupRepository.getGroupById(groupId)) {
             this.respondError(res, `Group does not exist!`, 404);
             return;
         }
 
-        if (!this.deviceRepository.getDeviceById(req.params.deviceId)) {
+        if (!this.deviceRepository.getDeviceById(deviceId)) {
             this.respondError(res, `Device does not exist!`, 404);
             return;
         }
         try {
-            this.deviceRepository.updateDevice(req.params.deviceId, { groupId: req.params.groupId });
+            this.deviceRepository.updateDevice(deviceId, { groupId });
         } catch (error:any) {
             this.respondError(res, `Cannot update device: ${error.message}`, 500);
             return;
         }
 
-        this.respondOk(res, this.deviceRepository.getDeviceById(req.params.deviceId).toObject());
+        this.respondOk(res, this.deviceRepository.getDeviceById(deviceId).toObject());
     }
 
     async removeDeviceFromGroup(req: Request, res: Response): Promise<void> {
-        if (!this.groupRepository.getGroupById(req.params.groupId)) {
+        const { groupId, deviceId } = req.params;
+
+        if (!this.groupRepository.getGroupById(groupId)) {
             this.respondError(res, `Group does not exist!`, 404);
             return;
         }
 
-        const device:BaseDevice = this.deviceRepository.getDeviceById(req.params.deviceId);
+        const device:BaseDevice = this.deviceRepository.getDeviceById(deviceId);
         if (!device) {
             this.respondError(res, `Device does not exist!`, 404);
             return;
         }
 
         if (device.groupId != req.params.groupId) {
-            this.respondError(res, `Device ${req.params.deviceId} is not in group ${req.params.groupId}`, 500);
+            this.respondError(res, `Device ${deviceId} is not in group ${groupId}`, 500);
             return;
         }
 
         try {
-            this.deviceRepository.updateDevice(req.params.deviceId, { groupId: null });
+            this.deviceRepository.updateDevice(deviceId, { groupId: null });
         } catch (error:any) {
             this.respondError(res, `Cannot update device: ${error.message}`, 500);
             return;
         }
 
-        this.respondOk(res, this.deviceRepository.getDeviceById(req.params.deviceId).toObject());
+        this.respondOk(res, this.deviceRepository.getDeviceById(deviceId).toObject());
     }
 
     async updateDeviceStatuses(req: Request, res: Response): Promise<void> {
-        if (!this.groupRepository.getGroupById(req.params.groupId)) {
+        const { groupId } = req.params;
+
+        if (!this.groupRepository.getGroupById(groupId)) {
             this.respondError(res, `Group does not exist!`, 404);
             return;
         }
 
-        const devices:Array<BaseDevice> = this.deviceRepository.getDevicesByGroupId(req.params.groupId);
+        const devices:Array<BaseDevice> = this.deviceRepository.getDevicesByGroupId(groupId);
         try {
             Promise.all(devices.map(device => {
                 const res = device.statusSchema.options({ stripUnknown: true }).validate(req.body)
