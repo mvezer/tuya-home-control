@@ -64,6 +64,15 @@ export default class DeviceRepository {
         await DeviceModel.updateOne({ deviceId}, updateDeviceData);
     }
 
+    async deleteDevice(deviceId: string):Promise<void> {
+        const device = this.getDeviceById(deviceId);
+        if (device) {
+            await device.disconnect();
+            this.devices = this.devices.filter(d => d.deviceId !== deviceId );
+            await DeviceModel.deleteOne({ deviceId });
+        }
+    }
+
     getAllDevices():Array<BaseDevice> {
         return this.devices;
     }

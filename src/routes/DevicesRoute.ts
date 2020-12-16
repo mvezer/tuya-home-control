@@ -22,6 +22,10 @@ export default class DevicesRoute implements IRoute {
             this.devicesController.update(req, res);
         });
 
+        app.delete(`${BASE_URL}/:deviceId`, (req: Request, res: Response) => {
+            this.devicesController.delete(req, res);
+        });
+
         app.get(`${BASE_URL}/:deviceId/status`, (req: Request, res: Response) => {
             this.devicesController.getDeviceStatus(req, res);
         });

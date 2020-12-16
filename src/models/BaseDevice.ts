@@ -24,6 +24,7 @@ export default abstract class BaseDevice {
     private _tuyaDevice:any;
     private _lastHeartbeat:number;
     private _firstConnectAttempt:boolean;
+    private _heartBeatTimeout:any;
 
     private _onData:(handlerData:TDeviceData, error: any) => void;
     private _onError:(handlerData:TDeviceData, error: any) => void;
@@ -60,6 +61,17 @@ export default abstract class BaseDevice {
                 this._firstConnectAttempt = false;
                 setTimeout(this.tick.bind(this), TICK_TIMEOUT * 1000);
             }
+        }
+    }
+
+    public async disconnect(): Promise<void> {
+        if (this.isConnected) {
+            await this._tuyaDevice.disconnect();
+            this._tuyaDevice.removeAllListeners();
+        }
+
+        if (this._heartBeatTimeout) {
+            clearTimeout(this._heartBeatTimeout);
         }
     }
 
@@ -115,7 +127,7 @@ export default abstract class BaseDevice {
             this.connect();
         }
 
-        setTimeout(this.tick.bind(this), TICK_TIMEOUT * 1000);
+        this._heartBeatTimeout = setTimeout(this.tick.bind(this), TICK_TIMEOUT * 1000);
     }
 
     private updateStatusFromDPS(dps:object): void {

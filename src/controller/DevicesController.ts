@@ -92,6 +92,17 @@ export default class DevicesController extends BaseController {
         this.respondOk(res);
     }
 
+    async delete(req: Request, res: Response):Promise<void> {
+        try {
+            await this.deviceRepository.deleteDevice(req.params.deviceId);
+        } catch (error:any) {
+            res.status(500).json({ data: null, error: `Cannot delete device! ${error.message}` });
+            return;
+        }
+
+        this.respondOk(res);
+    }
+
     getAll(req: Request, res: Response): void {
         const data = this.deviceRepository
             .getAllDevices()
