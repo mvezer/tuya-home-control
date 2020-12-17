@@ -160,7 +160,7 @@ export default class GroupsController extends BaseController {
             return;
         }
 
-        if (device.groupId != req.params.groupId) {
+        if (device.groupId !== req.params.groupId) {
             this.respondError(res, `Device ${deviceId} is not in group ${groupId}`, 500);
             return;
         }
@@ -186,8 +186,8 @@ export default class GroupsController extends BaseController {
         const devices:Array<BaseDevice> = this.deviceRepository.getDevicesByGroupId(groupId);
         try {
             Promise.all(devices.map(device => {
-                const res = device.statusSchema.options({ stripUnknown: true }).validate(req.body)
-                device.setStatus(res.value);
+                const validationResult = device.statusSchema.options({ stripUnknown: true }).validate(req.body)
+                device.setStatus(validationResult.value);
             }));
         } catch (error: any) {
             this.respondError(res, `Cannot update device: ${error.message}`, 500);

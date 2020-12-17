@@ -19,8 +19,7 @@
     }
   },
   "include": [
-    "src/**/*",
-    "typings-custom/**/*.ts"
+    "./src/**/*"
   ],
   "exclude": ["node_modules", ".vscode"]
 }

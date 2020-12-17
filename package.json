@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "prebuild": "rm -rf dist/* && tslint -c tslint.json -p    tsconfig.json --fix",
+    "prebuild": "rm -rf dist/*",
     "build": "tsc && cp -rf package.json dist/package.json",
     "prestart": "npm run build",
     "start": "ts-node .",
