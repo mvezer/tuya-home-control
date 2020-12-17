@@ -6,258 +6,592 @@
 	},
 	"item": [
 		{
-			"name": "device.register",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"name\": \"Tisch 1\",\n    \"deviceId\": \"bf931ea3fdd2b87dd0koaz\",\n    \"key\": \"74226bb5df5fc8dd\",\n    \"type\": \"rgb_bulb\"\n  }",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
+			"name": "devices",
+			"item": [
+				{
+					"name": "device.register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Tisch 1\",\n    \"deviceId\": \"bf931ea3fdd2b87dd0koaz\",\n    \"key\": \"74226bb5df5fc8dd\",\n    \"type\": \"rgb_bulb\"\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}devices",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}devices"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://{{base_url}}devices",
-					"protocol": "http",
-					"host": [
-						"{{base_url}}devices"
-					]
+				{
+					"name": "device.update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Tisch NEW\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}devices/bf931ea3fdd2b87dd0koaz",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}devices"
+							],
+							"path": [
+								"bf931ea3fdd2b87dd0koaz"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
 				},
-				"description": "Add a new device to the THC system"
-			},
-			"response": []
+				{
+					"name": "device.delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}devices/bf931ea3fdd2b87dd0koaz",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}devices"
+							],
+							"path": [
+								"bf931ea3fdd2b87dd0koaz"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
+				},
+				{
+					"name": "device.updateStatus",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"intensity\": 20\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}devices/bf5c77d9af9980f0f8ok2a/status",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}devices"
+							],
+							"path": [
+								"bf5c77d9af9980f0f8ok2a",
+								"status"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
+				},
+				{
+					"name": "device.addDeviceToGroup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}groups/63cfbe2ec9f1b25d9e0d22e9bcf3179a9d119bf9/devices/bf931ea3fdd2b87dd0koaz",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}groups"
+							],
+							"path": [
+								"63cfbe2ec9f1b25d9e0d22e9bcf3179a9d119bf9",
+								"devices",
+								"bf931ea3fdd2b87dd0koaz"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
+				},
+				{
+					"name": "device.updateGroupStatus",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"isOn\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}groups/63cfbe2ec9f1b25d9e0d22e9bcf3179a9d119bf9/status",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}groups"
+							],
+							"path": [
+								"63cfbe2ec9f1b25d9e0d22e9bcf3179a9d119bf9",
+								"status"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
+				},
+				{
+					"name": "device.getStatus",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}devices/bf5c77d9af9980f0f8ok2a/status",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}devices"
+							],
+							"path": [
+								"bf5c77d9af9980f0f8ok2a",
+								"status"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
+				},
+				{
+					"name": "device.getAll",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}devices",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}devices"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "device.update",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"name\": \"Tisch NEW\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
+			"name": "groups",
+			"item": [
+				{
+					"name": "groups.register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"bingo\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}groups",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}groups"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://{{base_url}}devices/bf931ea3fdd2b87dd0koaz",
-					"protocol": "http",
-					"host": [
-						"{{base_url}}devices"
-					],
-					"path": [
-						"bf931ea3fdd2b87dd0koaz"
-					]
+				{
+					"name": "groups.update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nname\": \"bingbongboing\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}groups/63cfbe2ec9f1b25d9e0d22e9bcf3179a9d119bf9",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}groups"
+							],
+							"path": [
+								"63cfbe2ec9f1b25d9e0d22e9bcf3179a9d119bf9"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
 				},
-				"description": "Add a new device to the THC system"
-			},
-			"response": []
+				{
+					"name": "groups.get",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}groups/63cfbe2ec9f1b25d9e0d22e9bcf3179a9d119bf9",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}groups"
+							],
+							"path": [
+								"63cfbe2ec9f1b25d9e0d22e9bcf3179a9d119bf9"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
+				},
+				{
+					"name": "groups.getAll",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}groups",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}groups"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
+				},
+				{
+					"name": "groups.removeDeviceFromGroup",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}groups/48c4a5a850e0e69adc5cc6bab7edbb3971653e55/devices/bf5c77d9af9980f0f8ok2a",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}groups"
+							],
+							"path": [
+								"48c4a5a850e0e69adc5cc6bab7edbb3971653e55",
+								"devices",
+								"bf5c77d9af9980f0f8ok2a"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
+				},
+				{
+					"name": "groups.addDeviceToGroup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}groups/48c4a5a850e0e69adc5cc6bab7edbb3971653e55/devices/bf5c77d9af9980f0f8ok2a",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}groups"
+							],
+							"path": [
+								"48c4a5a850e0e69adc5cc6bab7edbb3971653e55",
+								"devices",
+								"bf5c77d9af9980f0f8ok2a"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
+				},
+				{
+					"name": "groups.remove",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}groups/63cfbe2ec9f1b25d9e0d22e9bcf3179a9d119bf9",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}groups"
+							],
+							"path": [
+								"63cfbe2ec9f1b25d9e0d22e9bcf3179a9d119bf9"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "device.updateStatus",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"intensity\": 20\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
+			"name": "presets",
+			"item": [
+				{
+					"name": "presets.register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Coolpreset1\",\n    \"groupId\": \"48c4a5a850e0e69adc5cc6bab7edbb3971653e55\",\n    \"status\": { \"isOn\": true }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}presets",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}presets"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://{{base_url}}devices/bf5c77d9af9980f0f8ok2a/status",
-					"protocol": "http",
-					"host": [
-						"{{base_url}}devices"
-					],
-					"path": [
-						"bf5c77d9af9980f0f8ok2a",
-						"status"
-					]
+				{
+					"name": "presets.update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Coolpresetv2.0\",\n    \"status\": {\n        \"isOn\": true,\n        \"intensity\": 1000\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}presets/602d010aa8206fb7264e27077de36cc8fa53c6ff",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}presets"
+							],
+							"path": [
+								"602d010aa8206fb7264e27077de36cc8fa53c6ff"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
 				},
-				"description": "Add a new device to the THC system"
-			},
-			"response": []
-		},
-		{
-			"name": "group.register",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"name\": \"bingo\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
+				{
+					"name": "presets.apply",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Coolpresetv2.0\",\n    \"status\": {\n        \"isOn\": true,\n        \"intensity\": 1000\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}presets/602d010aa8206fb7264e27077de36cc8fa53c6ff/apply",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}presets"
+							],
+							"path": [
+								"602d010aa8206fb7264e27077de36cc8fa53c6ff",
+								"apply"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://{{base_url}}groups",
-					"protocol": "http",
-					"host": [
-						"{{base_url}}groups"
-					]
+				{
+					"name": "presets.get",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}presets/602d010aa8206fb7264e27077de36cc8fa53c6ff",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}presets"
+							],
+							"path": [
+								"602d010aa8206fb7264e27077de36cc8fa53c6ff"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
 				},
-				"description": "Add a new device to the THC system"
-			},
-			"response": []
-		},
-		{
-			"name": "group.update",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"nname\": \"bingbongboing\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://{{base_url}}groups/63cfbe2ec9f1b25d9e0d22e9bcf3179a9d119bf9",
-					"protocol": "http",
-					"host": [
-						"{{base_url}}groups"
-					],
-					"path": [
-						"63cfbe2ec9f1b25d9e0d22e9bcf3179a9d119bf9"
-					]
-				},
-				"description": "Add a new device to the THC system"
-			},
-			"response": []
-		},
-		{
-			"name": "group.get",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://{{base_url}}groups/63cfbe2ec9f1b25d9e0d22e9bcf3179a9d119bf9",
-					"protocol": "http",
-					"host": [
-						"{{base_url}}groups"
-					],
-					"path": [
-						"63cfbe2ec9f1b25d9e0d22e9bcf3179a9d119bf9"
-					]
-				},
-				"description": "Add a new device to the THC system"
-			},
-			"response": []
-		},
-		{
-			"name": "group.getAll",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://{{base_url}}groups",
-					"protocol": "http",
-					"host": [
-						"{{base_url}}groups"
-					]
-				},
-				"description": "Add a new device to the THC system"
-			},
-			"response": []
-		},
-		{
-			"name": "device.getStatus",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://{{base_url}}devices/bf5c77d9af9980f0f8ok2a/status",
-					"protocol": "http",
-					"host": [
-						"{{base_url}}devices"
-					],
-					"path": [
-						"bf5c77d9af9980f0f8ok2a",
-						"status"
-					]
-				},
-				"description": "Add a new device to the THC system"
-			},
-			"response": []
-		},
-		{
-			"name": "device.getAll",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://{{base_url}}devices",
-					"protocol": "http",
-					"host": [
-						"{{base_url}}devices"
-					]
-				},
-				"description": "Add a new device to the THC system"
-			},
-			"response": []
+				{
+					"name": "presets.getAll",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}presets",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}presets"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
 		}
 	],
 	"event": [
