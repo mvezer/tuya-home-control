@@ -17,9 +17,10 @@ build:	## build containers
 
 up:		## gets all containers up
 	docker-compose up -d --build
-	npm run start
+	npm run build && npm run pm2
 
 down:		## gets all containers up
+	npm run stop
 	docker-compose down
 
 run:	## run stuff
