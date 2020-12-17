@@ -182,18 +182,23 @@ export default class GroupsController extends BaseController {
             this.respondError(res, `Group does not exist!`, 404);
             return;
         }
-
-        const devices:Array<BaseDevice> = this.deviceRepository.getDevicesByGroupId(groupId);
+        
         try {
-            Promise.all(devices.map(device => {
-                const validationResult = device.statusSchema.options({ stripUnknown: true }).validate(req.body)
-                device.setStatus(validationResult.value);
-            }));
+            await this.applyDeviceStatusUpdate(groupId, req.body);
         } catch (error: any) {
             this.respondError(res, `Cannot update device: ${error.message}`, 500);
             return;
         }
 
         this.respondOk(res);
+    }
+
+    async applyDeviceStatusUpdate(groupId: string, status: Object):Promise<void> {
+        console.log(groupId, status);
+        const devices:Array<BaseDevice> = this.deviceRepository.getDevicesByGroupId(groupId);
+        Promise.all(devices.map(device => {
+            const validationResult = device.statusSchema.options({ stripUnknown: true }).validate(status)
+            device.setStatus(validationResult.value);
+        }));
     }
 }

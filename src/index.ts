@@ -4,11 +4,14 @@ import SingletonHandler from './handlers/SingletonHandler';
 import MongoDbHandler from './handlers/MongoDbHandler';
 import DevicesRoute from './routes/DevicesRoute';
 import GroupsRoute from './routes/GroupsRoute';
+import PresetsRoute from './routes/PresetsRoute';
 import DeviceRepository from './models/DeviceRepository';
 import DevicesController from './controller/DevicesController';
 import figlet from 'figlet';
 import GroupRepository from './models/GroupRepository';
 import GroupsController from './controller/GroupsController';
+import PresetRepository from './models/PresetRepository';
+import PresetsController from './controller/PresetsController';
 
 
 const init = async () => {
@@ -18,12 +21,14 @@ const init = async () => {
     await SingletonHandler.getInstance('MongoDbHandler').connect();
     await Promise.all([
         SingletonHandler.getInstance('DeviceRepository').init(),
-        SingletonHandler.getInstance('GroupRepository').init()
+        SingletonHandler.getInstance('GroupRepository').init(),
+        SingletonHandler.getInstance('PresetRepository').init()
     ]);
 
     app.setupRoutes([
         SingletonHandler.getInstance('DevicesRoute'),
-        SingletonHandler.getInstance('GroupsRoute')
+        SingletonHandler.getInstance('GroupsRoute'),
+        SingletonHandler.getInstance('PresetsRoute')
     ]);
 }
 
@@ -41,6 +46,10 @@ const registerSingletons = () => {
     const groupRepository:GroupRepository = SingletonHandler.register('GroupRepository', new GroupRepository());
     const groupsController = SingletonHandler.register('GroupsController', new GroupsController(groupRepository, deviceRepository));
     SingletonHandler.register('GroupsRoute', new GroupsRoute(groupsController));
+
+    const presetRepository:PresetRepository = SingletonHandler.register('PresetRepository', new PresetRepository());
+    const presetsController:PresetsController = SingletonHandler.register('PresetsController', new PresetsController(presetRepository, groupRepository, groupsController));
+    SingletonHandler.register('PresetsRoute', new PresetsRoute(presetsController));
 }
 
 registerSingletons();
