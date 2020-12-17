@@ -12,7 +12,7 @@ help: ## This help.
 .DEFAULT_GOAL := help
 
 build:	## build containers
-	docker-compose -d build
+	docker-compose build
 	npm run build
 
 up:		## gets all containers up
