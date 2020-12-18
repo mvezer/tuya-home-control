@@ -11,13 +11,9 @@ const DeviceModel = mongoose.model('Device', new mongoose.Schema({
     groupId: { type: String, required: false }
 }));
 
-export default class DeviceRepository {
+export default class DevicesRepository {
     private devices:Array<BaseDevice> = [];
     private _isInitialized:boolean = false;
-
-    constructor() {
-        
-    }
 
     async init():Promise<void> {
         try {

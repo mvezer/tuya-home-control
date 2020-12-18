@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import BaseController from './BaseController';
 import Joi from 'joi';
-import Preset from '../models/Preset';
-import PresetRepository from '../models/PresetRepository';
-import GroupRepository from '../models/GroupRepository';
+import Preset from '../models/preset/Preset';
+import PresetsRepository from '../models/preset/PresetsRepository';
+import GroupsRepository from '../models/group/GroupsRepository';
 import GroupsController from './GroupsController';
 
 const PRESET_ADD_SCHEMA = Joi.object().keys({
@@ -19,11 +19,11 @@ const PRESET_UPDATE_SCHEMA = Joi.object().keys({
 });
 
 export default class PresetsController extends BaseController {
-    private presetRepository:PresetRepository;
-    private groupRepository:GroupRepository;
+    private presetRepository:PresetsRepository;
+    private groupRepository:GroupsRepository;
     private groupsController:GroupsController;
 
-    constructor(presetRepository:PresetRepository, groupRepository:GroupRepository, groupsController:GroupsController) {
+    constructor(presetRepository:PresetsRepository, groupRepository:GroupsRepository, groupsController:GroupsController) {
         super();
         this.presetRepository = presetRepository;
         this.groupRepository = groupRepository;
@@ -43,14 +43,18 @@ export default class PresetsController extends BaseController {
             return;
         }
 
+        let preset:Preset;
+
         try {
-            await this.presetRepository.add(req.body)
+            preset = await this.presetRepository.add(req.body)
         } catch (error:any) {
             this.respondError(res, `Cannot add preset: ${error.getMessage()}`);
             return;
         }
 
-        this.respondOk(res);
+        console.info(`[PresetsController] preset (id: ${preset.presetId}) was added`);
+
+        this.respondOk(res, preset.toObject());
     }
 
     async update(req: Request, res: Response): Promise<void> {
@@ -73,14 +77,18 @@ export default class PresetsController extends BaseController {
             return;
         }
 
+        let preset:Preset;
+
         try {
-            await this.presetRepository.update(presetId, req.body);
+            preset = await this.presetRepository.update(presetId, req.body);
         } catch (error:any) {
             this.respondError(res, `Cannot update preset: ${error.message}`);
             return;
         }
 
-        this.respondOk(res);
+        console.info(`[PresetsController] preset (id: ${preset.presetId}) was updated`);
+
+        this.respondOk(res, preset.toObject());
     }
 
     async delete(req: Request, res: Response):Promise<void> {
@@ -92,6 +100,8 @@ export default class PresetsController extends BaseController {
             this.respondError(res, `Cannot delete preset! ${error.message}`);
             return;
         }
+
+        console.info(`[PresetsController] preset (id: ${presetId}) was deleted`);
 
         this.respondOk(res);
     }

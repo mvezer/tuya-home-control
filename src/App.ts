@@ -1,4 +1,4 @@
-import express, { Application, Response } from 'express';
+import express, { Application } from 'express';
 import {AddressInfo} from 'net';
 
 import * as bodyParser from 'body-parser';
@@ -20,12 +20,7 @@ export default class App {
     }
 
     private configure() {
-        this._app.use(bodyParser.json({
-            limit: '50mb',
-            verify(req: any, res, buf, encoding) {
-                req.rawBody = buf;
-            }
-        }));
+        this._app.use(bodyParser.json());
     }
 
     setupRoutes(routes:IRoute[]):void {

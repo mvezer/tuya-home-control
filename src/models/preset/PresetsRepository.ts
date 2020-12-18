@@ -8,7 +8,7 @@ const PresetModel = mongoose.model('Preset', new mongoose.Schema({
     status: { type: Object, required: true }
 }));
 
-export default class PresetRepository {
+export default class PresetsRepository {
     private presets:Array<Preset> = [];
 
     private _isInitialized:boolean = false;
@@ -23,18 +23,22 @@ export default class PresetRepository {
         return this.presets.find(preset => preset.presetId === presetId);
     }
 
-    async add(newPresetData:any):Promise<void> {
+    async add(newPresetData:any):Promise<Preset> {
         if (this.getById(newPresetData.presetId)) {
             throw new Error(`[PresetRepository] ERROR: cannot add preset, preset already exists`);
-        } else {
-            const newPreset = Preset.fromObject(newPresetData);
-            await (new PresetModel(newPreset.toObject())).save();
-            this.presets.push(newPreset);
-        }
+
+            return null;
+
+        } 
+
+        const newPreset = Preset.fromObject(newPresetData);
+        await (new PresetModel(newPreset.toObject())).save();
+        this.presets.push(newPreset);
+
+        return newPreset;
     }
 
-    async update(presetId: string, updatePresetData:object):Promise<void> {
-        console.log('updating')
+    async update(presetId: string, updatePresetData:object):Promise<Preset> {
         const preset:Preset = this.getById(presetId);
         for (let [k, v] of Object.entries(updatePresetData)) {
             switch (k) {
@@ -50,6 +54,8 @@ export default class PresetRepository {
             }
         }
         await PresetModel.updateOne({ presetId }, updatePresetData);
+
+        return preset;
     }
 
     async delete(presetId: string):Promise<void> {

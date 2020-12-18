@@ -6,7 +6,7 @@ const GroupModel = mongoose.model('Group', new mongoose.Schema({
     groupId: { type: String, required: true, unique: true },
 }));
 
-export default class GroupRepository {
+export default class GroupsRepository {
     private groups:Array<Group> = [];
     private _isInitialized:boolean = false;
 

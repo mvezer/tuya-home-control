@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import BaseController from "./BaseController";
 import Joi from 'joi';
-import GroupRepository from "../models/GroupRepository";
-import DeviceRepository from '../models/DeviceRepository';
-import Group from '../models/Group';
-import BaseDevice from '../models/BaseDevice';
+import GroupsRepository from "../models/group/GroupsRepository";
+import DevicesRepository from '../models/device/DevicesRepository';
+import Group from '../models/group/Group';
+import BaseDevice from '../models/device/BaseDevice';
 
 const GROUP_ADD_SCHEMA = Joi.object().keys({
     name: Joi.string().required(),
@@ -15,10 +15,10 @@ const GROUP_UPDATE_SCHEMA = Joi.object().keys({
 });
 
 export default class GroupsController extends BaseController {
-    private groupRepository:GroupRepository;
-    private deviceRepository:DeviceRepository;
+    private groupRepository:GroupsRepository;
+    private deviceRepository:DevicesRepository;
 
-    constructor(groupRepository:GroupRepository, deviceRepository:DeviceRepository) {
+    constructor(groupRepository:GroupsRepository, deviceRepository:DevicesRepository) {
         super();
         this.groupRepository = groupRepository;
         this.deviceRepository = deviceRepository;
@@ -47,6 +47,8 @@ export default class GroupsController extends BaseController {
             return;
         }
 
+        console.info(`[GroupController] group (${name}) registered`);
+
         this.respondOk(res, newGroup.toObject());
     }
 
@@ -72,6 +74,8 @@ export default class GroupsController extends BaseController {
             return;
         }
 
+        console.info(`[GroupController] group (id: ${groupId}) updated`);
+
         this.respondOk(res);
     }
 
@@ -92,6 +96,8 @@ export default class GroupsController extends BaseController {
             this.respondError(res, `Cannot delete group: ${error.message}`);
             return;
         }
+
+        console.info(`[GroupController] group (id: ${groupId}) deleted`);
 
         this.respondOk(res);
     }
@@ -143,6 +149,8 @@ export default class GroupsController extends BaseController {
             return;
         }
 
+        console.info(`[GroupController] device (id: ${deviceId}) added to group (${groupId})`);
+
         this.respondOk(res, this.deviceRepository.getDeviceById(deviceId).toObject());
     }
 
@@ -172,6 +180,8 @@ export default class GroupsController extends BaseController {
             return;
         }
 
+        console.info(`[GroupController] device (id: ${deviceId}) removed from group (${groupId})`);
+
         this.respondOk(res, this.deviceRepository.getDeviceById(deviceId).toObject());
     }
 
@@ -193,8 +203,7 @@ export default class GroupsController extends BaseController {
         this.respondOk(res);
     }
 
-    async applyDeviceStatusUpdate(groupId: string, status: Object):Promise<void> {
-        console.log(groupId, status);
+    async applyDeviceStatusUpdate(groupId: string, status: any):Promise<void> {
         const devices:Array<BaseDevice> = this.deviceRepository.getDevicesByGroupId(groupId);
         Promise.all(devices.map(device => {
             const validationResult = device.statusSchema.options({ stripUnknown: true }).validate(status)

@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import BaseController from './BaseController';
 import Joi from 'joi';
-import BaseDevice, { DEVICE_TYPES } from '../models/BaseDevice';
-import DeviceRepository from '../models/DeviceRepository';
+import BaseDevice, { DEVICE_TYPES } from '../models/device/BaseDevice';
+import DevicesRepository from '../models/device/DevicesRepository';
 
 const DEVICE_ADD_SCHEMA = Joi.object().keys({
     deviceId: Joi.string().required(),
@@ -17,9 +17,9 @@ const DEVICE_UPDATE_SCHEMA = Joi.object().keys({
 });
 
 export default class DevicesController extends BaseController {
-    private deviceRepository:DeviceRepository;
+    private deviceRepository:DevicesRepository;
 
-    constructor(deviceRepository:DeviceRepository) {
+    constructor(deviceRepository:DevicesRepository) {
         super();
         this.deviceRepository = deviceRepository;
     }
@@ -34,7 +34,7 @@ export default class DevicesController extends BaseController {
 
         try {
             await this.deviceRepository.addDevice(req.body)
-        } catch (error:any) {
+        } catch (error) {
             this.respondError(res, `Cannot add device: ${error.getMessage()}`);
             return;
         }
@@ -59,7 +59,7 @@ export default class DevicesController extends BaseController {
 
         try {
             await this.deviceRepository.updateDevice(deviceId, req.body);
-        } catch (error:any) {
+        } catch (error) {
             this.respondError(res, `Cannot update device: ${error.getMessage()}`);
             return;
         }
