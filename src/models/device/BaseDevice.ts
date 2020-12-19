@@ -1,4 +1,6 @@
+import Logger from '../../handlers/Logger';
 const TuyaDevice = require('tuyapi');
+
 
 export const DEVICE_TYPES = ['rgb_bulb', 'plug'];
 export const TICK_TIMEOUT = 10;
@@ -25,6 +27,7 @@ export default abstract class BaseDevice {
     private _lastHeartbeat:number;
     private _firstConnectAttempt:boolean;
     private _heartBeatTimeout:any;
+    private logger:Logger;
 
     private _onData:(handlerData:TDeviceData, error: any) => void;
     private _onError:(handlerData:TDeviceData, error: any) => void;
@@ -39,11 +42,12 @@ export default abstract class BaseDevice {
         this._status = {};
         this._groupId = deviceData.groupId;
         this._firstConnectAttempt = true;
+        this.logger = new Logger('device');
     }
 
     public async connect(): Promise<void> {
         this._tuyaDevice = new TuyaDevice({ id: this._deviceId, key: this._key });
-        console.debug(`[device] ${this.toString()} connecting...`);
+        this.logger.info(`${this.logger.surround(this.toString())} connecting...`);
 
         this._tuyaDevice.on('connected', this.handleConnected.bind(this));
         this._tuyaDevice.on('disconnected', this.handleDisconnected.bind(this));
@@ -55,7 +59,7 @@ export default abstract class BaseDevice {
             await this._tuyaDevice.find();
             await this._tuyaDevice.connect();
         } catch (error:any) {
-            console.error(`[device] ${this.toString()}, ERROR when connecting: ${error}`);
+            this.logger.error(`${this.logger.surround(this.toString())} connection failed: ${error}`);
         } finally {
             if (this._firstConnectAttempt) {
                 this._firstConnectAttempt = false;
@@ -76,30 +80,30 @@ export default abstract class BaseDevice {
     }
 
     private handleConnected() {
-        console.debug(`[device] ${this.toString()} connected`);
+        this.logger.info(`${this.logger.surround(this.toString())} connected`);
         if (this._onConnected) {
             this._onConnected(this.toObject(), null);
         }
     }
 
     private handleDisconnected() {
-        console.debug(`[device] ${this.toString()} disconnected`);
+        this.logger.info(`${this.logger.surround(this.toString())} disconnected`);
         if (this._onDisconnected) {
             this._onDisconnected(this.toObject(), null);
         }
     }
 
     private handleError(error:any) {
-        console.error(`[device] ${this.toString()}, ERROR: ${error}`);
+        this.logger.error(`${this.logger.surround(this.toString())} ${error}`);
         if (this._onError) {
             this._onError(this.toObject(), error);
         }
     }
 
     private async handleData(data:any) {
-        console.debug(`[device] ${this.toString()} data received`);
+        this.logger.info(`${this.logger.surround(this.toString())} data received`);
         
-        let dps:object = {};
+        let dps = {};
 
         try {
             dps = data['dps'];
@@ -111,8 +115,7 @@ export default abstract class BaseDevice {
             }
 
         } catch (error: any) {
-            console.error(`[device] ${this.toString()}, ERROR when parsing data: ${error}`);
-            console.debug('     ', data);
+            this.logger.error(`${this.logger.surround(this.toString())} parse error: ${error},\n     data: ${data}`);
         }
     }
 
@@ -131,7 +134,7 @@ export default abstract class BaseDevice {
     }
 
     private updateStatusFromDPS(dps:object): void {
-        for (let [dpsKey, dpsValue] of Object.entries(dps)) {
+        for (const [dpsKey, dpsValue] of Object.entries(dps)) {
             if (this.dpsMap.has(dpsKey)) {
                 this._status[this.dpsMap.get(dpsKey)] = dpsValue;
             }
@@ -149,9 +152,9 @@ export default abstract class BaseDevice {
         return this._status;
     }
 
-    async setStatus(newStatus: { [index:string]:string }) {
-        let dpsDto:{ [index:string]:string } = {}
-        for (let [statusKey, statusValue] of Object.entries(newStatus)) {
+    async setStatus(newStatus: { [index:string]:string }):Promise<void> {
+        const dpsDto:{ [index:string]:string } = {}
+        for (const [statusKey, statusValue] of Object.entries(newStatus)) {
             const dpsKey = this.getDPSkey(statusKey);
             if (null !== dpsKey) {
                 this._status[statusKey] = statusValue;
@@ -162,8 +165,9 @@ export default abstract class BaseDevice {
         if (this.isConnected && {} !== dpsDto) {
             try {
                 await this._tuyaDevice.set({ multiple: true, data: dpsDto });
+                this.logger.info(`${this.logger.surround(this.toString())} status set to: ${newStatus}`);
             } catch (error: any) {
-                console.error(`[device] ${this.toString()}, ERROR when setting Tuya DPS: ${error}`)
+                this.logger.error(`${this.logger.surround(this.toString())} could not set status: ${error}`)
             }
         }
     }
@@ -192,16 +196,16 @@ export default abstract class BaseDevice {
         return this._tuyaDevice && this._tuyaDevice.isConnected();
     }
 
-    get onData():(handlerData:TDeviceData, error: any) => void {
-        return this._onData;
-    }
-
     get groupId():string {
         return this._groupId;
     }
 
     set groupId(newGroupId: string) {
         this._groupId = newGroupId;
+    }
+
+    get onData():(handlerData:TDeviceData, error: any) => void {
+        return this._onData;
     }
 
     set onData(handlerFunction: (handlerData:TDeviceData, error: any) => void) {
@@ -212,7 +216,7 @@ export default abstract class BaseDevice {
 
     abstract get statusSchema():any;
 
-    toString(fullData: boolean = false):string {
+    toString(fullData = false):string {
         if (!fullData) {
             return `${this.name} (${this.deviceId})`;
         }
