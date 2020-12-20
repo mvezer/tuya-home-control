@@ -1,5 +1,6 @@
 import * as mongoose from 'mongoose';
 import Preset from './Preset';
+import Logger from '../../handlers/Logger';
 
 const PresetModel = mongoose.model('Preset', new mongoose.Schema({
     presetId: { type: String, required: true, unique: true },
@@ -10,8 +11,13 @@ const PresetModel = mongoose.model('Preset', new mongoose.Schema({
 
 export default class PresetsRepository {
     private presets:Array<Preset> = [];
+    private _isInitialized:boolean;
+    private logger:Logger;
 
-    private _isInitialized:boolean = false;
+    constructor() {
+        this._isInitialized = false;
+        this.logger = new Logger('PresetsRepository');
+    }
 
     async init():Promise<void> {
         this.presets = await this.loadAllFromDb();
@@ -23,13 +29,12 @@ export default class PresetsRepository {
         return this.presets.find(preset => preset.presetId === presetId);
     }
 
-    async add(newPresetData:any):Promise<Preset> {
+    async add(newPresetData: {[ index:string]: any }):Promise<Preset> {
         if (this.getById(newPresetData.presetId)) {
-            throw new Error(`[PresetRepository] ERROR: cannot add preset, preset already exists`);
+            throw new Error(`cannot add preset, preset already exists`);
 
             return null;
-
-        } 
+        }
 
         const newPreset = Preset.fromObject(newPresetData);
         await (new PresetModel(newPreset.toObject())).save();
@@ -38,9 +43,9 @@ export default class PresetsRepository {
         return newPreset;
     }
 
-    async update(presetId: string, updatePresetData:object):Promise<Preset> {
+    async update(presetId: string, updatePresetData:{ [index:string] : any}):Promise<Preset> {
         const preset:Preset = this.getById(presetId);
-        for (let [k, v] of Object.entries(updatePresetData)) {
+        for (const [k, v] of Object.entries(updatePresetData)) {
             switch (k) {
                 case 'name':
                     preset.name = v;
@@ -67,7 +72,6 @@ export default class PresetsRepository {
     }
 
     async loadAllFromDb():Promise<Preset[]> {
-        let devices:Array<Preset> = [];
         try {
             this.presets = (await PresetModel.find())
                 .map(presetDocument => Preset.fromDbData({
@@ -78,7 +82,7 @@ export default class PresetsRepository {
                 })
             );
         } catch (error: any) {
-            console.error(`[PresetRepository] ERROR in init: ${error.message}`);
+            this.logger.error(`cannot load presets ${error.message}`);
         }
 
         return this.presets;

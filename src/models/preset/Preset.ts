@@ -22,7 +22,7 @@ export default class Preset {
         );
     }
 
-    static fromObject(presetData: any):Preset {
+    static fromObject(presetData:{[index:string]:any}):Preset {
         return new Preset(
             presetData.name,
             presetData.groupId,
@@ -30,7 +30,7 @@ export default class Preset {
         );
     }
 
-    constructor(name: string, groupId: string, status:any, presetId: string = null) {
+    constructor(name: string, groupId: string, status:{[index:string]:any}, presetId: string = null) {
         this._name = name;
         this._groupId = groupId;
         this._status = status;
@@ -47,20 +47,20 @@ export default class Preset {
         this._name = newName;
     }
 
-    set groupId(newGroupId: string) {
-        this._groupId = newGroupId;
-    }
-
-    get status(): any {
+    get status():{[index:string]:any} {
         return this._status;
     }
 
-    set status(newStatus: any) {
+    set status(newStatus:{[index:string]:any}) {
         this._status = newStatus;
     }
 
     get groupId():string {
         return this._groupId;
+    }
+
+    set groupId(newGroupId: string) {
+        this._groupId = newGroupId;
     }
 
     get presetId():string {

@@ -1,6 +1,8 @@
 import * as mongoose from 'mongoose';
 import BaseDevice, {TDeviceData} from './BaseDevice';
 import DeviceFactory from './DeviceFactory';
+import Logger from '../../handlers/Logger';
+
 const DEVICE_TYPES = ['rgb_bulb', 'plug'];
 
 const DeviceModel = mongoose.model('Device', new mongoose.Schema({
@@ -13,41 +15,45 @@ const DeviceModel = mongoose.model('Device', new mongoose.Schema({
 
 export default class DevicesRepository {
     private devices:Array<BaseDevice> = [];
-    private _isInitialized:boolean = false;
+    private _isInitialized:boolean;
+    private logger:Logger;
+
+    constructor() {
+        this.logger = new Logger('DevicesRepository');
+        this._isInitialized = false;
+    }
 
     async init():Promise<void> {
         try {
             (await this.loadAllFromDb()).map(device => this.initDevice(device), this);
         } catch (error: any) {
-            console.error(`[DeviceRepository] ERROR in init: ${error.message}`);
+            this.logger.error(`init failed: ${error.message}`);
         }
 
         this._isInitialized = true;
     }
 
     async initDevice(device:BaseDevice): Promise<void> {
-        device.onData = this.onDeviceData.bind(this);
         await device.connect();
         this.devices.push(device);
     }
 
-    async onDeviceData(handlerData:TDeviceData, error: any): Promise<void> {
-        // console.log(JSON.stringify(handlerData, null, 4));
-    }
-
-    async addDevice(newDeviceData:TDeviceData):Promise<void> {
+    async addDevice(newDeviceData:TDeviceData):Promise<BaseDevice> {
         if (this.getDeviceById(newDeviceData.deviceId)) {
-            throw new Error(`[DeviceRepository] ERROR: cannot add device, device (deviceId: $newDeviceData.deviceId}) already exists`);
-        } else {
-            const newDevice = DeviceFactory.fromObject(newDeviceData);
-            await this.initDevice(newDevice);
-            await (new DeviceModel(newDevice.toObject())).save();
+            throw new Error(`cannot add device, device (deviceId: $newDeviceData.deviceId}) already exists`);
+            return null;
         }
+
+        const newDevice = DeviceFactory.fromObject(newDeviceData);
+        await this.initDevice(newDevice);
+        await (new DeviceModel(newDevice.toObject())).save();
+        
+        return newDevice;
     }
 
-    async updateDevice(deviceId: string, updateDeviceData:object):Promise<void> {
+    async updateDevice(deviceId: string, updateDeviceData:{[index:string]:any}):Promise<BaseDevice> {
         const device:BaseDevice = this.getDeviceById(deviceId);
-        for (let [k, v] of Object.entries(updateDeviceData)) {
+        for (const [k, v] of Object.entries(updateDeviceData)) {
             switch (k) {
                 case 'name':
                     device.name = v;
@@ -58,6 +64,8 @@ export default class DevicesRepository {
             }
         }
         await DeviceModel.updateOne({ deviceId}, updateDeviceData);
+
+        return device;
     }
 
     async deleteDevice(deviceId: string):Promise<void> {
@@ -96,7 +104,7 @@ export default class DevicesRepository {
                 })
             );
         } catch (error: any) {
-            console.error(`[DeviceRepository] ERROR in init: ${error.message}`);
+            this.logger.error(`cannot load devices: ${error.message}`);
         }
 
         return devices;

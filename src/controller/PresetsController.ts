@@ -5,6 +5,7 @@ import Preset from '../models/preset/Preset';
 import PresetsRepository from '../models/preset/PresetsRepository';
 import GroupsRepository from '../models/group/GroupsRepository';
 import GroupsController from './GroupsController';
+import Logger from '../handlers/Logger';
 
 const PRESET_ADD_SCHEMA = Joi.object().keys({
     groupId: Joi.string().required(),
@@ -22,12 +23,14 @@ export default class PresetsController extends BaseController {
     private presetRepository:PresetsRepository;
     private groupRepository:GroupsRepository;
     private groupsController:GroupsController;
+    private logger:Logger;
 
     constructor(presetRepository:PresetsRepository, groupRepository:GroupsRepository, groupsController:GroupsController) {
         super();
         this.presetRepository = presetRepository;
         this.groupRepository = groupRepository;
         this.groupsController = groupsController;
+        this.logger = new Logger('PresetRepository');
     }
 
     async add(req: Request, res: Response):Promise<void> {
@@ -52,7 +55,7 @@ export default class PresetsController extends BaseController {
             return;
         }
 
-        console.info(`[PresetsController] preset (id: ${preset.presetId}) was added`);
+        this.logger.info(`preset (id: ${preset.presetId}) has been  added`);
 
         this.respondOk(res, preset.toObject());
     }
@@ -86,7 +89,7 @@ export default class PresetsController extends BaseController {
             return;
         }
 
-        console.info(`[PresetsController] preset (id: ${preset.presetId}) was updated`);
+        this.logger.info(`preset (id: ${preset.presetId}) has been updated`);
 
         this.respondOk(res, preset.toObject());
     }
@@ -101,7 +104,7 @@ export default class PresetsController extends BaseController {
             return;
         }
 
-        console.info(`[PresetsController] preset (id: ${presetId}) was deleted`);
+        this.logger.info(`preset (id: ${presetId}) has been deleted`);
 
         this.respondOk(res);
     }
@@ -122,6 +125,8 @@ export default class PresetsController extends BaseController {
             this.respondError(res, `Cannot apply preset: ${error.message}`);
             return;
         }
+
+        this.logger.info(`preset (id: ${preset.presetId}) has been applied`);
 
         this.respondOk(res);
     }

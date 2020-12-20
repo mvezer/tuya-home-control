@@ -1,5 +1,5 @@
 import Logger from '../../handlers/Logger';
-const TuyaDevice = require('tuyapi');
+const TuyaDevice = require('tuyapi');  // eslint-disable-line @typescript-eslint/no-var-requires
 
 
 export const DEVICE_TYPES = ['rgb_bulb', 'plug'];
@@ -42,7 +42,7 @@ export default abstract class BaseDevice {
         this._status = {};
         this._groupId = deviceData.groupId;
         this._firstConnectAttempt = true;
-        this.logger = new Logger('device');
+        this.logger = new Logger(deviceData.type === 'plug' ? 'PlugDevice' : 'RGBbulbDevice');
     }
 
     public async connect(): Promise<void> {
@@ -133,7 +133,7 @@ export default abstract class BaseDevice {
         this._heartBeatTimeout = setTimeout(this.tick.bind(this), TICK_TIMEOUT * 1000);
     }
 
-    private updateStatusFromDPS(dps:object): void {
+    private updateStatusFromDPS(dps:{[index:string]:any}): void {
         for (const [dpsKey, dpsValue] of Object.entries(dps)) {
             if (this.dpsMap.has(dpsKey)) {
                 this._status[this.dpsMap.get(dpsKey)] = dpsValue;

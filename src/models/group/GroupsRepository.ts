@@ -1,5 +1,6 @@
 import * as mongoose from 'mongoose';
-import Group, {TGroupData} from './Group';
+import Group from './Group';
+import Logger from '../../handlers/Logger';
 
 const GroupModel = mongoose.model('Group', new mongoose.Schema({
     name: { type: String, required: true, unique: true },
@@ -8,13 +9,19 @@ const GroupModel = mongoose.model('Group', new mongoose.Schema({
 
 export default class GroupsRepository {
     private groups:Array<Group> = [];
-    private _isInitialized:boolean = false;
+    private _isInitialized:boolean;
+    private logger:Logger;
+
+    constructor() {
+        this._isInitialized = false;
+        this.logger = new Logger('GroupsRepository');
+    }
 
     async init():Promise<void> {
         try {
             this.groups = await this.loadAllFromDb();
         } catch (error: any) {
-            console.error(`[DeviceRepository] ERROR in init: ${error.message}`);
+            this.logger.error(`init: ${error.message}`);
         }
 
         this._isInitialized = true;
@@ -36,9 +43,9 @@ export default class GroupsRepository {
         return this.groups.find(group => group.groupId === groupId);
     }
 
-    async update(groupId: string, updateGroupData:object):Promise<void> {
+    async update(groupId: string, updateGroupData:{[index:string]:any}):Promise<void> {
         const group:Group = this.getGroupById(groupId);
-        for (let [k, v] of Object.entries(updateGroupData)) {
+        for (const [k, v] of Object.entries(updateGroupData)) {
             switch (k) {
                 case 'name':
                     group.name = v;
@@ -66,7 +73,7 @@ export default class GroupsRepository {
                 })
             );
         } catch (error: any) {
-            console.error(`[GroupRepository] ERROR in init: ${error.message}`);
+            this.logger.error(`loading groups failed: ${error.message}`);
         }
 
         return groups;

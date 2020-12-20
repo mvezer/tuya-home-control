@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import Logger from './Logger';
 
 const MAX_RECONNECTION_ATTEMPTS = 5;
 
@@ -10,6 +11,7 @@ export default class MongoDbHandler {
     private _connectionInstance: typeof mongoose;
     public isConnected: boolean;
     private _reconnectionAttempts: number;
+    private logger:Logger;
 
     constructor(url: string, port: number, dbName: string) {
         this._url = url;
@@ -18,6 +20,7 @@ export default class MongoDbHandler {
         this._connectionString = this.createConnectionString(url, port, dbName);
         this.isConnected = false;
         this._reconnectionAttempts = 0;
+        this.logger = new Logger('MongoDbHandler');
 
         mongoose.connection.on('connected', this.onConnected.bind(this));
         mongoose.connection.on('disconnected', this.onDisconnected.bind(this));
@@ -34,32 +37,48 @@ export default class MongoDbHandler {
                 }
             );
         } catch (error: any) {
-            console.error(`[MongoDB] ERROR: ${error.message}`);
+            this.logger.error(`cannot create instance ${error.message}`);
         }
         
     }
 
     private onConnected() {
-        console.info('[MongoDB] connected');
+        this.logger.info('connected');
         this.isConnected = true;
         this._reconnectionAttempts = 0;
     }
 
     private async onDisconnected() {
-        console.info('[MongoDB] disconnected');
+        this.logger.info('disconnected');
         this.isConnected = false;
         this._reconnectionAttempts += 1;
         if (this._reconnectionAttempts <= MAX_RECONNECTION_ATTEMPTS) {
-            console.info(`[MongoDB] trying to reconnect (attempt ${this._reconnectionAttempts}/${MAX_RECONNECTION_ATTEMPTS})`);
+            this.logger.info(`trying to reconnect (attempt ${this._reconnectionAttempts}/${MAX_RECONNECTION_ATTEMPTS})`);
             await this.connect();
         }
     }
 
     private onConnecting() {
-        console.info(`[MongoDB] attempting to connect to ${this._connectionString}...`)
+        this.logger.info(`attempting to connect to ${this._connectionString}...`)
     }
 
     private createConnectionString(url: string, port: number, dbName: string): string {
         return `mongodb://${url}:${port}/${dbName}`;
+    }
+
+    get url(): string {
+        return this._url;
+    }
+
+    get dbname(): string {
+        return this._dbName;
+    }
+
+    get port():number {
+        return this._port;
+    }
+
+    get instance():typeof mongoose {
+        return this._connectionInstance;
     }
 }
