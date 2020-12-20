@@ -17,14 +17,11 @@ build:	## build containers
 
 up:		## gets all containers up
 	docker-compose up -d --build
-	npm run build && npm run pm2
+	npm run pm2
 
 down:		## gets all containers up
 	npm run stop
 	docker-compose down
-
-run:	## run stuff
-	docker-compose up -d --build
 
 dev:	## starts without containerizing the server and use nodemon
 	docker-compose up -d --build mongodb
