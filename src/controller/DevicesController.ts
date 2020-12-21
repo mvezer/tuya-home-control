@@ -38,7 +38,7 @@ export default class DevicesController extends BaseController {
         let newDevice:BaseDevice;
 
         try {
-            await this.deviceRepository.addDevice(req.body)
+            newDevice = await this.deviceRepository.addDevice(req.body)
         } catch (error) {
             this.respondError(res, `Cannot add device: ${error.getMessage()}`);
             return;

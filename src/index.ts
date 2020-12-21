@@ -5,10 +5,12 @@ import {
     devicesRoute,
     groupsRoute,
     presetsRoute,
+    combosRoute,
     mongoDbHandler,
     devicesRepository,
     groupsRepository,
-    presetsRepository
+    presetsRepository,
+    combosRepository
 } from './Dependencies';
 
 const logger = new Logger('index');
@@ -27,7 +29,8 @@ const init = async () => {
         await Promise.all([
             devicesRepository.init(),
             groupsRepository.init(),
-            presetsRepository.init()
+            presetsRepository.init(),
+            combosRepository.init(),
         ]);
     } catch (error:any) {
         logger.critical(`init failed ${error.message}`);
@@ -38,7 +41,7 @@ const init = async () => {
         port: parseInt(process.env.SERVER_PORT, 10)
     });
     
-    app.setupRoutes([ devicesRoute, groupsRoute, presetsRoute ]);
+    app.setupRoutes([ devicesRoute, groupsRoute, presetsRoute, combosRoute ]);
 
     app.start();
 }

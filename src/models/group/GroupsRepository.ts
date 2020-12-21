@@ -56,6 +56,7 @@ export default class GroupsRepository {
     }
 
     async delete(groupId: string):Promise<void> {
+        this.groups = this.groups.filter(g => g.groupId !== groupId);
         await GroupModel.deleteOne({ groupId });
     }
 

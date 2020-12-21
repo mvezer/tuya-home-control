@@ -112,23 +112,29 @@ export default class PresetsController extends BaseController {
     async apply(req: Request, res: Response):Promise<void> {
         const { presetId } = req.params;
 
-        const preset:Preset = this.presetRepository.getById(presetId);
-
-        if (!preset) {
-            this.respondError(res, `Preset does not exist!`, 404);
-            return;
-        }
-
+        let preset:Preset;
+        
         try {
-            await this.groupsController.applyDeviceStatusUpdate(preset.groupId, preset.status);
-        } catch (error: any) {
+            preset = await this.applyPreset(presetId);
+        } catch (error:any) {
             this.respondError(res, `Cannot apply preset: ${error.message}`);
-            return;
         }
 
         this.logger.info(`preset (id: ${preset.presetId}) has been applied`);
 
         this.respondOk(res);
+    }
+
+    public async applyPreset(presetId:string):Promise<Preset> {
+        const preset:Preset = this.presetRepository.getById(presetId);
+
+        if (!preset) {
+            throw new Error('preset does not exist');
+        }
+
+        await this.groupsController.applyDeviceStatusUpdate(preset.groupId, preset.status);
+
+        return preset;
     }
 
     getAll(req: Request, res: Response): void {

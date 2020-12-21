@@ -237,8 +237,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "groups",
@@ -250,7 +249,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"bingo\"\n}",
+							"raw": "{\n    \"name\": \"Group B\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -275,7 +274,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"nname\": \"bingbongboing\"\n}",
+							"raw": "{\n    \"name\": \"Group A\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -283,13 +282,13 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{base_url}}groups/63cfbe2ec9f1b25d9e0d22e9bcf3179a9d119bf9",
+							"raw": "http://{{base_url}}groups/48c4a5a850e0e69adc5cc6bab7edbb3971653e55",
 							"protocol": "http",
 							"host": [
 								"{{base_url}}groups"
 							],
 							"path": [
-								"63cfbe2ec9f1b25d9e0d22e9bcf3179a9d119bf9"
+								"48c4a5a850e0e69adc5cc6bab7edbb3971653e55"
 							]
 						},
 						"description": "Add a new device to the THC system"
@@ -400,15 +399,15 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{base_url}}groups/48c4a5a850e0e69adc5cc6bab7edbb3971653e55/devices/bf5c77d9af9980f0f8ok2a",
+							"raw": "http://{{base_url}}groups/d30204aa4ec6bce8ca7c702d905b3de1d678ecf8/devices/bf5c3c248fb32fe3a5abqo",
 							"protocol": "http",
 							"host": [
 								"{{base_url}}groups"
 							],
 							"path": [
-								"48c4a5a850e0e69adc5cc6bab7edbb3971653e55",
+								"d30204aa4ec6bce8ca7c702d905b3de1d678ecf8",
 								"devices",
-								"bf5c77d9af9980f0f8ok2a"
+								"bf5c3c248fb32fe3a5abqo"
 							]
 						},
 						"description": "Add a new device to the THC system"
@@ -443,8 +442,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "presets",
@@ -590,15 +588,130 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
+		},
+		{
+			"name": "combos",
+			"item": [
+				{
+					"name": "combos.register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"my combo\",\n    \"presets\": [ \"602d010aa8206fb7264e27077de36cc8fa53c6ff\" ],\n    \"icon\": \"coolIcon.svg\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}combos",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}combos"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
+				},
+				{
+					"name": "combos.addPreset",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"my combo\",\n    \"presets\": [ \"602d010aa8206fb7264e27077de36cc8fa53c6ff\" ],\n    \"icon\": \"coolIcon.svg\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}combos/c7d0fe452f34b70615924ba1bf1265b0e47df8ac/presets/9b5c2fa8e981bb7effe537472a7a97945a8b15e3",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}combos"
+							],
+							"path": [
+								"c7d0fe452f34b70615924ba1bf1265b0e47df8ac",
+								"presets",
+								"9b5c2fa8e981bb7effe537472a7a97945a8b15e3"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
+				},
+				{
+					"name": "combos.apply",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Coolpresetv2.0\",\n    \"status\": {\n        \"isOn\": true,\n        \"intensity\": 1000\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}combos/c7d0fe452f34b70615924ba1bf1265b0e47df8ac/apply",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}combos"
+							],
+							"path": [
+								"c7d0fe452f34b70615924ba1bf1265b0e47df8ac",
+								"apply"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
+				},
+				{
+					"name": "combos.getAll",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{base_url}}combos",
+							"protocol": "http",
+							"host": [
+								"{{base_url}}combos"
+							]
+						},
+						"description": "Add a new device to the THC system"
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"event": [
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "5a65df91-3ace-4f41-a4cb-311eb2a19357",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -608,13 +721,11 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "fb259c07-595f-451c-ae7e-4cdda7a60a19",
 				"type": "text/javascript",
 				"exec": [
 					""
 				]
 			}
 		}
-	],
-	"protocolProfileBehavior": {}
+	]
 }
