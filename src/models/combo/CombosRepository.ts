@@ -48,6 +48,9 @@ export default class CombosRepository {
                 case 'presets':
                     combo.presets = v;
                     break;
+                case 'icon':
+                    combo.icon = v;
+                    break;
             }
         }
         await ComboModel.updateOne({comboId}, updateComboData);
