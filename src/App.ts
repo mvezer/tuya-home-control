@@ -4,6 +4,7 @@ import Logger from './handlers/Logger';
 
 import * as bodyParser from 'body-parser';
 import { IRoute } from './routes/IRoute';
+import * as path from 'path';
 
 export type TAppConfig = {
     port: number
@@ -25,6 +26,7 @@ export default class App {
 
     private configure() {
         this._app.use(bodyParser.json());
+        this._app.use('/static', express.static('public'))
     }
 
     setupRoutes(routes:IRoute[]):void {
