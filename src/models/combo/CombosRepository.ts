@@ -91,8 +91,9 @@ export default class CombosRepository {
             combos = (await ComboModel.find())
                 .map(comboDocument => new Combo(
                     comboDocument.get('name'),
-                    comboDocument.get('comboId'),
-                    comboDocument.get('presets')
+                    comboDocument.get('icon'),
+                    comboDocument.get('presets'),
+                    comboDocument.get('comboId')
                 )            );
         } catch (error: any) {
             this.logger.error(`loading combos failed: ${error.message}`);
