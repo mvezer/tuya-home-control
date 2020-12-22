@@ -8,9 +8,9 @@
     "build": "npm run lint && tsc && cp -rf package.json dist/package.json",
     "start": "ts-node .",
     "dev": "nodemon",
-    "pm2": "npx pm2 start dist/index.js --name 'thc' --restart-delay=3000",
-    "logs": "npx pm2 logs thc --lines 1000",
-    "stop": "npx pm2 stop thc",
+    "pm2": "pm2 start dist/index.js --name 'thc' --restart-delay=3000",
+    "logs": "pm2 logs thc --lines 1000",
+    "stop": "pm2 stop thc",
     "lint": "eslint src/**/* --ext .ts"
   },
   "keywords": [],
