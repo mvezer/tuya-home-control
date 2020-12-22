@@ -10,7 +10,6 @@ const DeviceModel = mongoose.model('Device', new mongoose.Schema({
     key: { type: String, required: true },
     type: { type: String, enum: DEVICE_TYPES, required: true },
     name: { type: String, required: true },
-    groupId: { type: String, required: false }
 }));
 
 export default class DevicesRepository {
@@ -58,9 +57,6 @@ export default class DevicesRepository {
                 case 'name':
                     device.name = v;
                     break;
-                case 'groupId':
-                    device.groupId = v;
-                    break;
             }
         }
         await DeviceModel.updateOne({ deviceId}, updateDeviceData);
@@ -85,10 +81,6 @@ export default class DevicesRepository {
         return this.devices.find(device => device.deviceId === deviceId);
     }
 
-    getDevicesByGroupId(groupId:string):Array<BaseDevice> {
-        return this.devices.filter(device => device.groupId === groupId) || [];
-    }
-
     async loadAllFromDb():Promise<BaseDevice[]> {
         let devices:Array<BaseDevice> = [];
         try {
@@ -99,7 +91,6 @@ export default class DevicesRepository {
                     key: deviceDocument.get('key'),
                     type: deviceDocument.get('type'),
                     status: {},
-                    groupId: deviceDocument.get('groupId'),
                     isConnected: false
                 })
             );

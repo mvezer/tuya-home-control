@@ -5,6 +5,7 @@ import Logger from '../../handlers/Logger';
 const GroupModel = mongoose.model('Group', new mongoose.Schema({
     name: { type: String, required: true, unique: true },
     groupId: { type: String, required: true, unique: true },
+    devices: { type: Array, optional: true }
 }));
 
 export default class GroupsRepository {
@@ -27,8 +28,8 @@ export default class GroupsRepository {
         this._isInitialized = true;
     }
 
-    async add(name:string):Promise<Group> {
-        const newGroup = new Group(name);
+    async add(name:string, devices:Array<string> = []):Promise<Group> {
+        const newGroup = new Group(name, devices);
         this.groups.push(newGroup);
         await (new GroupModel(newGroup.toObject())).save();
 
@@ -50,6 +51,9 @@ export default class GroupsRepository {
                 case 'name':
                     group.name = v;
                     break;
+                case 'devices':
+                    group.devices = v;
+                    break;
             }
         }
         await GroupModel.updateOne({ groupId}, updateGroupData);
@@ -68,10 +72,11 @@ export default class GroupsRepository {
         let groups:Array<Group> = [];
         try {
             groups = (await GroupModel.find())
-                .map(groupDocument => Group.fromDbData({
-                    groupId: groupDocument.get('groupId'),
-                    name: groupDocument.get('name'),
-                })
+                .map(groupDocument => new Group(
+                    groupDocument.get('name'),
+                    groupDocument.get('devices') || [],
+                    groupDocument.get('groupId')
+                )
             );
         } catch (error: any) {
             this.logger.error(`loading groups failed: ${error.message}`);

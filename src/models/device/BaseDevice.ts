@@ -13,7 +13,6 @@ export type TDeviceData = {
     type: string,
     isConnected: boolean,
     status: any,
-    groupId: string
 }
 
 export default abstract class BaseDevice {
@@ -22,7 +21,6 @@ export default abstract class BaseDevice {
     private _key: string;
     private _type: string;
     private _status:{ [index:string] : string };
-    private _groupId: string;
     private _tuyaDevice:any;
     private _lastHeartbeat:number;
     private _firstConnectAttempt:boolean;
@@ -40,7 +38,6 @@ export default abstract class BaseDevice {
         this._key = deviceData.key;
         this._type = deviceData.type;
         this._status = {};
-        this._groupId = deviceData.groupId;
         this._firstConnectAttempt = true;
         this.logger = new Logger(deviceData.type === 'plug' ? 'PlugDevice' : 'RGBbulbDevice');
     }
@@ -196,14 +193,6 @@ export default abstract class BaseDevice {
         return this._tuyaDevice && this._tuyaDevice.isConnected();
     }
 
-    get groupId():string {
-        return this._groupId;
-    }
-
-    set groupId(newGroupId: string) {
-        this._groupId = newGroupId;
-    }
-
     get onData():(handlerData:TDeviceData, error: any) => void {
         return this._onData;
     }
@@ -232,7 +221,6 @@ export default abstract class BaseDevice {
             type: this.type,
             isConnected: this.isConnected,
             status: this.status,
-            groupId: this.groupId,
         };
     }
 
