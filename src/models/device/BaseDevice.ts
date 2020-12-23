@@ -102,7 +102,9 @@ export default abstract class BaseDevice {
         
         let dps = {};
 
-        this.logger.debug(`data received: ${JSON.stringify(data)}`);
+        this.handleHeartbeat();
+
+        // this.logger.debug(`data received: ${JSON.stringify(data)}`);
 
         try {
             dps = data['dps'];
